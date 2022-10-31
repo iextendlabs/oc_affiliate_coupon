@@ -1,0 +1,251 @@
+{{ header }}
+<div id="account-account" class="container">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+      <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+    {% endfor %}
+  </ul>
+  <div class="row">{{ column_left }}
+    {% if column_left and column_right %}
+      {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+      {% set class = 'col-sm-9' %}
+    {% else %}
+      {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-list"></i> Filter Transactions </h3>
+        </div>
+        <div class="panel-body">
+          <form action="{{ filter_report_action }}" method="POST" >
+            <select name="filter_report_month" class="form-control" id="filter">
+              <option value="">Select</option>
+              {% for month in months %}
+                <option value="month={{ month.month }}&year={{ month.year }}" {% if filter_report_month == month.month %}{{ 'selected' }}{% endif %}>{{ month.label }}</option>
+              {% endfor %}
+            </select>
+            <script type="text/javascript">
+            $('#filter').on('change',function(){
+            location.href='{{filter_report_action}}&'+$(this).val();
+            });
+            </script>
+          </form>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_completed_orders }}</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td class="text-left "><b>{{ column_order_id }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_added }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_modified }}</b></a></td>
+                  <td class="text-left"><b>{{ column_description }}</b></a></td>
+                  <td class="text-left"><b>{{ column_order_subtotal }}</b></a></td>
+                  <td class="text-left"><b>{{ column_commission }}</b></a></td>
+                </tr>
+              </thead>
+              <tbody>
+                {% if completed_transactions %}
+                  {% for completed_transaction in completed_transactions %}
+                    <tr>
+                      <td class="text-left">{{ completed_transaction.order_id }}</td>
+                      <td class="text-left">{{ completed_transaction.date_added }}</td>
+                      <td class="text-left">{{ completed_transaction.date_modified }}</td>
+                      <td class="text-left">{{ completed_transaction.description }}</td>
+                      <td class="text-left">{{ completed_transaction.order_total }}</td>
+                      <td class="text-left">{{ completed_transaction.amount }}</td>
+                    </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="text-right" colspan="5"><b>{{ column_balance }}</b></td>
+                    <td class="text-left">{{ completed_orders_commission }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td class="text-center" colspan="8">{{ text_no_results }}</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_shipped_orders }}</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td class="text-left "><b>{{ column_order_id }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_added }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_modified }}</b></a></td>
+                  <td class="text-left"><b>{{ column_description }}</b></a></td>
+                  <td class="text-left"><b>{{ column_order_subtotal }}</b></a></td>
+                  <td class="text-left"><b>{{ column_commission }}</b></a></td>
+                </tr>
+              </thead>
+              <tbody>
+                {% if shipped_transactions %}
+                  {% for shipped_transaction in shipped_transactions %}
+                    <tr>
+                      <td class="text-left">{{ shipped_transaction.order_id }}</td>
+                      <td class="text-left">{{ shipped_transaction.date_added }}</td>
+                      <td class="text-left">{{ shipped_transaction.date_modified }}</td>
+                      <td class="text-left">{{ shipped_transaction.description }}</td>
+                      <td class="text-left">{{ shipped_transaction.order_total }}</td>
+                      <td class="text-left">{{ shipped_transaction.amount }}</td>
+                    </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="text-right" colspan="5"><b>{{ column_balance }}</b></td>
+                    <td class="text-left">{{ shipped_orders_commission }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td class="text-center" colspan="8">{{ text_no_results }}</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_cancelled_orders }}</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td class="text-left "><b>{{ column_order_id }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_added }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_modified }}</b></a></td>
+                  <td class="text-left"><b>{{ column_description }}</b></a></td>
+                  <td class="text-left"><b>{{ column_order_subtotal }}</b></a></td>
+                  <td class="text-left"><b>{{ column_commission }}</b></a></td>
+                </tr>
+              </thead>
+              <tbody>
+                {% if cancelled_transactions %}
+                  {% for cancelled_transaction in cancelled_transactions %}
+                    <tr>
+                      <td class="text-left">{{ cancelled_transaction.order_id }}</td>
+                      <td class="text-left">{{ cancelled_transaction.date_added }}</td>
+                      <td class="text-left">{{ cancelled_transaction.date_modified }}</td>
+                      <td class="text-left">{{ cancelled_transaction.description }}</td>
+                      <td class="text-left">{{ cancelled_transaction.order_total }}</td>
+                      <td class="text-left">{{ cancelled_transaction.amount }}</td>
+                    </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="text-right" colspan="5"><b>{{ column_balance }}</b></td>
+                    <td class="text-left">{{ cancelled_orders_commission }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td class="text-center" colspan="8">{{ text_no_results }}</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_pending_orders }}</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td class="text-left "><b>{{ column_order_id }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_added }}</b></a></td>
+                  <td class="text-left"><b>{{ column_description }}</b></a></td>
+                  <td class="text-left"><b>{{ column_order_subtotal }}</b></a></td>
+                  <td class="text-left"><b>{{ column_commission }}</b></a></td>
+                </tr>
+              </thead>
+              <tbody>
+                {% if pending_transactions %}
+                  {% for pending_transaction in pending_transactions %}
+                    <tr>
+                      <td class="text-left">{{ pending_transaction.order_id }}</td>
+                      <td class="text-left">{{ pending_transaction.date_added }}</td>
+                      <td class="text-left">{{ pending_transaction.description }}</td>
+                      <td class="text-left">{{ pending_transaction.order_total }}</td>
+                      <td class="text-left">{{ pending_transaction.amount }}</td>
+                    </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="text-right" colspan="4"><b>{{ column_balance }}</b></td>
+                    <td class="text-left">{{ pending_orders_commission }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td class="text-center" colspan="8">{{ text_no_results }}</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_processing_orders }}</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td class="text-left "><b>{{ column_order_id }}</b></a></td>
+                  <td class="text-left "><b>{{ column_date_added }}</b></a></td>
+                  <td class="text-left"><b>{{ column_description }}</b></a></td>
+                  <td class="text-left"><b>{{ column_order_subtotal }}</b></a></td>
+                  <td class="text-left"><b>{{ column_commission }}</b></a></td>
+                </tr>
+              </thead>
+              <tbody>
+                {% if processing_transactions %}
+                  {% for processing_transaction in processing_transactions %}
+                    <tr>
+                      <td class="text-left">{{ processing_transaction.order_id }}</td>
+                      <td class="text-left">{{ processing_transaction.date_added }}</td>
+                      <td class="text-left">{{ processing_transaction.description }}</td>
+                      <td class="text-left">{{ processing_transaction.order_total }}</td>
+                      <td class="text-left">{{ processing_transaction.amount }}</td>
+                    </tr>
+                  {% endfor %}
+                  <tr>
+                    <td class="text-right" colspan="4"><b>{{ column_balance }}</b></td>
+                    <td class="text-left">{{ processing_orders_commission }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td class="text-center" colspan="8">{{ text_no_results }}</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {{ content_bottom }}</div>
+  {{ column_right }}</div>
+</div>
+{{ footer }}
