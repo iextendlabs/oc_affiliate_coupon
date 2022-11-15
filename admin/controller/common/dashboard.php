@@ -5,22 +5,22 @@ class ControllerCommonDashboard extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$data['user_token'] = $this->session->data['user_token'];
+		$data['heading_title'] = $this->language->get('heading_title');
 
 		$data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
 		);
 
 		// Check install directory exists
-		if (is_dir(DIR_CATALOG . '../install')) {
+		if (is_dir(dirname(DIR_APPLICATION) . '/install')) {
 			$data['error_install'] = $this->language->get('error_install');
 		} else {
 			$data['error_install'] = '';
@@ -29,16 +29,16 @@ class ControllerCommonDashboard extends Controller {
 		// Dashboard Extensions
 		$dashboards = array();
 
-		$this->load->model('setting/extension');
+		$this->load->model('extension/extension');
 
 		// Get a list of installed modules
-		$extensions = $this->model_setting_extension->getInstalled('dashboard');
-
+		$extensions = $this->model_extension_extension->getInstalled('dashboard');
+		
 		// Add all the modules which have multiple settings for each module
 		foreach ($extensions as $code) {
 			if ($this->config->get('dashboard_' . $code . '_status') && $this->user->hasPermission('access', 'extension/dashboard/' . $code)) {
 				$output = $this->load->controller('extension/dashboard/' . $code . '/dashboard');
-
+				
 				if ($output) {
 					$dashboards[] = array(
 						'code'       => $code,
@@ -57,33 +57,23 @@ class ControllerCommonDashboard extends Controller {
 		}
 
 		array_multisort($sort_order, SORT_ASC, $dashboards);
-
+		
 		// Split the array so the columns width is not more than 12 on each row.
 		$width = 0;
 		$column = array();
 		$data['rows'] = array();
-
+		
 		foreach ($dashboards as $dashboard) {
 			$column[] = $dashboard;
-
+			
 			$width = ($width + $dashboard['width']);
-
+			
 			if ($width >= 12) {
 				$data['rows'][] = $column;
-
+				
 				$width = 0;
 				$column = array();
 			}
-		}
-
-		if (!empty($column)) {
-    			$data['rows'][] = $column;
-		}
-
-		if (DIR_STORAGE == DIR_SYSTEM . 'storage/') {
-			$data['security'] = $this->load->controller('common/security');
-		} else {
-			$data['security'] = '';
 		}
 
 		$data['header'] = $this->load->controller('common/header');

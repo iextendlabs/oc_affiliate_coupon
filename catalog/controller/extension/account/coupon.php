@@ -1,14 +1,29 @@
 <?php
 class ControllerExtensionAccountCoupon extends Controller{
 	public function index(){
-		if (!$this->customer->isLogged()) {
-			$this->session->data['redirect'] = $this->url->link('account/account', '', true);
+		if (!$this->affiliate->isLogged()) {
+			$this->session->data['redirect'] = $this->url->link('affiliate/account', '', true);
 
-			$this->response->redirect($this->url->link('account/login', '', true));
+			$this->response->redirect($this->url->link('affiliate/login', '', true));
 		}
 
 		$this->load->language('extension/account/coupon');
 
+		$data['heading_title'] = $this->language->get('heading_title');
+		
+		$data['column_name'] = $this->language->get('column_name');
+		$data['column_code'] = $this->language->get('column_code');
+		$data['column_discount'] = $this->language->get('column_discount');
+		$data['column_start_date'] = $this->language->get('column_start_date');
+		$data['column_end_date'] = $this->language->get('column_end_date');
+		$data['column_status'] = $this->language->get('column_status');
+		$data['column_commission'] = $this->language->get('column_commission');
+		$data['column_commission_amount'] = $this->language->get('column_commission_amount');
+		$data['text_list'] = $this->language->get('text_list');
+		$data['text_no_results'] = $this->language->get('text_no_results');
+		$data['text_enabled'] = $this->language->get('text_enabled');
+		$data['text_disabled'] = $this->language->get('text_disabled');
+		
 		$this->document->setTitle($this->language->get('heading_title'));
 
 		$data['breadcrumbs'] = array();
@@ -29,7 +44,8 @@ class ControllerExtensionAccountCoupon extends Controller{
 			'href' => $this->url->link('extension/account/coupon', '', true)
 		);
 
-		$affiliate_id = $this->customer->getId();
+
+		$affiliate_id = $this->affiliate->getId();
 
 		$this->load->model('extension/account/coupon');
 

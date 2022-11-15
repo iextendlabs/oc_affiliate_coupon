@@ -20,10 +20,6 @@ class ControllerExtensionPaymentPPPayflow extends Controller {
 
 		$this->load->model('checkout/order');
 
-		if(!isset($this->session->data['order_id'])) {
-			return false;
-		}
-
 		$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
 
 		$data['owner'] = $order_info['payment_firstname'] . ' ' . $order_info['payment_lastname'];
@@ -87,22 +83,18 @@ class ControllerExtensionPaymentPPPayflow extends Controller {
 
 		$this->load->model('checkout/order');
 
-		if(!isset($this->session->data['order_id'])) {
-			return false;
-		}
-
 		$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
 
-		if (!$this->config->get('payment_pp_payflow_transaction')) {
+		if (!$this->config->get('pp_payflow_transaction')) {
 			$payment_type = 'A';
 		} else {
 			$payment_type = 'S';
 		}
 
-		$request  = 'USER=' . urlencode($this->config->get('payment_pp_payflow_user'));
-		$request .= '&VENDOR=' . urlencode($this->config->get('payment_pp_payflow_vendor'));
-		$request .= '&PARTNER=' . urlencode($this->config->get('payment_pp_payflow_partner'));
-		$request .= '&PWD=' . urlencode($this->config->get('payment_pp_payflow_password'));
+		$request  = 'USER=' . urlencode($this->config->get('pp_payflow_user'));
+		$request .= '&VENDOR=' . urlencode($this->config->get('pp_payflow_vendor'));
+		$request .= '&PARTNER=' . urlencode($this->config->get('pp_payflow_partner'));
+		$request .= '&PWD=' . urlencode($this->config->get('pp_payflow_password'));
 		$request .= '&TENDER=C';
 		$request .= '&TRXTYPE=' . $payment_type;
 		$request .= '&AMT=' . $this->currency->format($order_info['total'], $order_info['currency_code'], false, false);
@@ -123,7 +115,7 @@ class ControllerExtensionPaymentPPPayflow extends Controller {
 		$request .= '&CARDISSUE=' . urlencode($this->request->post['cc_issue']);
 		$request .= '&BUTTONSOURCE=' . urlencode('OpenCart_2.0_PFP');
 
-		if (!$this->config->get('payment_pp_payflow_test')) {
+		if (!$this->config->get('pp_payflow_test')) {
 			$curl = curl_init('https://payflowpro.paypal.com');
 		} else {
 			$curl = curl_init('https://pilot-payflowpro.paypal.com');
@@ -168,7 +160,7 @@ class ControllerExtensionPaymentPPPayflow extends Controller {
 				$message .= 'TRANSACTIONID: ' . $response_info['TRANSACTIONID'] . "\n";
 			}
 
-			$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('payment_pp_payflow_order_status_id'), $message, false);
+			$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('pp_payflow_order_status_id'), $message, false);
 
 			$json['success'] = $this->url->link('checkout/success');
 		} else {

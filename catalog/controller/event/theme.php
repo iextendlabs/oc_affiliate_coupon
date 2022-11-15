@@ -1,31 +1,47 @@
 <?php
 class ControllerEventTheme extends Controller {
-	public function index(&$route, &$args, &$code) {
-
-		if (!$this->config->get('theme_' . $this->config->get('config_theme') . '_status')) {
+	public function index(&$view, &$data, &$output) {
+		if (!$this->config->get($this->config->get('config_theme') . '_status')) {
 			exit('Error: A theme has not been assigned to this store!');
 		}
-
-		// If the default theme is selected we need to know which directory its pointing to
-		if ($this->config->get('config_theme') == 'default') {
-			$directory = $this->config->get('theme_default_directory');
+		
+		// This is only here for compatibility with older extensions
+		if (substr($view, -3) == 'tpl') {
+			$view = substr($view, 0, -3);
+		}
+		
+		if ($this->config->get('config_theme') == 'theme_default') {
+			$theme = $this->config->get('theme_default_directory');
 		} else {
-			$directory = $this->config->get('config_theme');
+			$theme = $this->config->get('config_theme');
 		}
-
-		if ($directory != 'default' && is_file(DIR_TEMPLATE . $directory . '/template/' . $route . '.twig')) {
-			$this->config->set('template_directory', $directory . '/template/');
-		} elseif (is_file(DIR_TEMPLATE . 'default/template/' . $route . '.twig')) {
-			$this->config->set('template_directory', 'default/template/');
+		
+		if (is_file(DIR_TEMPLATE . $theme . '/template/' . $view . '.tpl')) {
+			$view = $theme . '/template/' . $view;
+		} else {
+			$view = 'default/template/' . $view;
 		}
-
-		// If there is a theme override we should get it
+		/*			
+		// If there is a theme override we should get it				
 		$this->load->model('design/theme');
-
-		$theme_info = $this->model_design_theme->getTheme($route, $directory);
-
+		
+		$theme_info = $this->model_design_theme->getTheme($view, $theme);
+		
 		if ($theme_info) {
-			$code = html_entity_decode($theme_info['code'], ENT_QUOTES, 'UTF-8');
+			extract($data);
+
+			ob_start();
+
+			eval('?>' . html_entity_decode($theme_info['code']));
+
+			$output = ob_get_clean();
+		} else {
+			if (is_file(DIR_TEMPLATE . $theme . '/template/' . $view . '.tpl')) {
+				$view = $theme . '/template/' . $view;
+			} else {
+				$view = 'default/template/' . $view;
+			}		
 		}
+		*/
 	}
 }

@@ -55,7 +55,7 @@ class ControllerToolUpload extends Controller {
 				$url .= '&page=' . $this->request->get['page'];
 			}
 
-			$this->response->redirect($this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->response->redirect($this->url->link('tool/upload', 'token=' . $this->session->data['token'] . $url, true));
 		}
 
 		$this->getList();
@@ -65,13 +65,13 @@ class ControllerToolUpload extends Controller {
 		if (isset($this->request->get['filter_name'])) {
 			$filter_name = $this->request->get['filter_name'];
 		} else {
-			$filter_name = '';
+			$filter_name = null;
 		}
 
 		if (isset($this->request->get['filter_date_added'])) {
 			$filter_date_added = $this->request->get['filter_date_added'];
 		} else {
-			$filter_date_added = '';
+			$filter_date_added = null;
 		}
 
 		if (isset($this->request->get['sort'])) {
@@ -87,7 +87,7 @@ class ControllerToolUpload extends Controller {
 		}
 
 		if (isset($this->request->get['page'])) {
-			$page = (int)$this->request->get['page'];
+			$page = $this->request->get['page'];
 		} else {
 			$page = 1;
 		}
@@ -118,15 +118,15 @@ class ControllerToolUpload extends Controller {
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/dashboard', 'user_token=' . $this->session->data['user_token'], true)
+			'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
 		);
 
 		$data['breadcrumbs'][] = array(
 			'text' => $this->language->get('heading_title'),
-			'href' => $this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . $url, true)
+			'href' => $this->url->link('tool/upload', 'token=' . $this->session->data['token'] . $url, true)
 		);
 
-		$data['delete'] = $this->url->link('tool/upload/delete', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['delete'] = $this->url->link('tool/upload/delete', 'token=' . $this->session->data['token'] . $url, true);
 
 		$data['uploads'] = array();
 
@@ -149,18 +149,32 @@ class ControllerToolUpload extends Controller {
 				'name'       => $result['name'],
 				'filename'   => $result['filename'],
 				'date_added' => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
-				'download'   => $this->url->link('tool/upload/download', 'user_token=' . $this->session->data['user_token'] . '&code=' . $result['code'] . $url, true)
+				'download'   => $this->url->link('tool/upload/download', 'token=' . $this->session->data['token'] . '&code=' . $result['code'] . $url, true)
 			);
 		}
 
-		$data['user_token'] = $this->session->data['user_token'];
+		$data['heading_title'] = $this->language->get('heading_title');
+		
+		$data['text_list'] = $this->language->get('text_list');
+		$data['text_no_results'] = $this->language->get('text_no_results');
+		$data['text_confirm'] = $this->language->get('text_confirm');
+
+		$data['column_name'] = $this->language->get('column_name');
+		$data['column_filename'] = $this->language->get('column_filename');
+		$data['column_date_added'] = $this->language->get('column_date_added');
+		$data['column_action'] = $this->language->get('column_action');
+
+		$data['entry_name'] = $this->language->get('entry_name');
+		$data['entry_date_added'] = $this->language->get('entry_date_added');
+
+		$data['button_download'] = $this->language->get('button_download');
+		$data['button_delete'] = $this->language->get('button_delete');
+		$data['button_filter'] = $this->language->get('button_filter');
+
+		$data['token'] = $this->session->data['token'];
 
 		if (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
-		} elseif (isset($this->session->data['error'])) {
-			$data['error_warning'] = $this->session->data['error'];
-
-			unset($this->session->data['error']);
 		} else {
 			$data['error_warning'] = '';
 		}
@@ -199,9 +213,9 @@ class ControllerToolUpload extends Controller {
 			$url .= '&page=' . $this->request->get['page'];
 		}
 
-		$data['sort_name'] = $this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . '&sort=name' . $url, true);
-		$data['sort_filename'] = $this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . '&sort=filename' . $url, true);
-		$data['sort_date_added'] = $this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . '&sort=date_added' . $url, true);
+		$data['sort_name'] = $this->url->link('tool/upload', 'token=' . $this->session->data['token'] . '&sort=name' . $url, true);
+		$data['sort_filename'] = $this->url->link('tool/upload', 'token=' . $this->session->data['token'] . '&sort=filename' . $url, true);
+		$data['sort_date_added'] = $this->url->link('tool/upload', 'token=' . $this->session->data['token'] . '&sort=date_added' . $url, true);
 
 		$url = '';
 
@@ -225,7 +239,7 @@ class ControllerToolUpload extends Controller {
 		$pagination->total = $upload_total;
 		$pagination->page = $page;
 		$pagination->limit = $this->config->get('config_limit_admin');
-		$pagination->url = $this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . $url . '&page={page}', true);
+		$pagination->url = $this->url->link('tool/upload', 'token=' . $this->session->data['token'] . $url . '&page={page}', true);
 
 		$data['pagination'] = $pagination->render();
 
@@ -255,34 +269,10 @@ class ControllerToolUpload extends Controller {
 	public function download() {
 		$this->load->model('tool/upload');
 
-		$this->load->language('tool/upload');
-
 		if (isset($this->request->get['code'])) {
 			$code = $this->request->get['code'];
 		} else {
 			$code = 0;
-		}
-
-		$url = '';
-
-		if (isset($this->request->get['filter_name'])) {
-			$url .= '&filter_name=' . urlencode(html_entity_decode($this->request->get['filter_name'], ENT_QUOTES, 'UTF-8'));
-		}
-
-		if (isset($this->request->get['filter_date_added'])) {
-			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
-		}
-
-		if (isset($this->request->get['sort'])) {
-			$url .= '&sort=' . $this->request->get['sort'];
-		}
-
-		if (isset($this->request->get['order'])) {
-			$url .= '&order=' . $this->request->get['order'];
-		}
-
-		if (isset($this->request->get['page'])) {
-			$url .= '&page=' . $this->request->get['page'];
 		}
 
 		$upload_info = $this->model_tool_upload->getUploadByCode($code);
@@ -291,24 +281,51 @@ class ControllerToolUpload extends Controller {
 			$file = DIR_UPLOAD . $upload_info['filename'];
 			$mask = basename($upload_info['name']);
 
-			if (file_exists($file) && filesize($file) > 0) {
-				$this->response->addheader('Pragma: public');
-				$this->response->addheader('Expires: 0');
-				$this->response->addheader('Content-Description: File Transfer');
-				$this->response->addheader('Content-Type: application/octet-stream');
-				$this->response->addheader('Content-Disposition: attachment; filename="' . ($mask ? $mask : basename($file)) . '"');
-				$this->response->addheader('Content-Transfer-Encoding: binary');
+			if (!headers_sent()) {
+				if (is_file($file)) {
+					header('Content-Type: application/octet-stream');
+					header('Content-Description: File Transfer');
+					header('Content-Disposition: attachment; filename="' . ($mask ? $mask : basename($file)) . '"');
+					header('Content-Transfer-Encoding: binary');
+					header('Expires: 0');
+					header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+					header('Pragma: public');
+					header('Content-Length: ' . filesize($file));
 
-				$this->response->setOutput(file_get_contents($file, FILE_USE_INCLUDE_PATH, null));
+					readfile($file, 'rb');
+					exit;
+				} else {
+					exit('Error: Could not find file ' . $file . '!');
+				}
 			} else {
-				$this->session->data['error'] = $this->language->get('error_file');
-
-				$this->response->redirect($this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . $url, true));
+				exit('Error: Headers already sent out!');
 			}
 		} else {
-			$this->session->data['error'] = $this->language->get('error_upload');
+			$this->load->language('error/not_found');
 
-			$this->response->redirect($this->url->link('tool/upload', 'user_token=' . $this->session->data['user_token'] . $url, true));
+			$this->document->setTitle($this->language->get('heading_title'));
+
+			$data['heading_title'] = $this->language->get('heading_title');
+
+			$data['text_not_found'] = $this->language->get('text_not_found');
+
+			$data['breadcrumbs'] = array();
+
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('text_home'),
+				'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
+			);
+
+			$data['breadcrumbs'][] = array(
+				'text' => $this->language->get('heading_title'),
+				'href' => $this->url->link('error/not_found', 'token=' . $this->session->data['token'], true)
+			);
+
+			$data['header'] = $this->load->controller('common/header');
+			$data['column_left'] = $this->load->controller('common/column_left');
+			$data['footer'] = $this->load->controller('common/footer');
+
+			$this->response->setOutput($this->load->view('error/not_found', $data));
 		}
 	}
 

@@ -32,17 +32,6 @@ class ControllerStartupStartup extends Controller {
 			}
 		}
 
-		// Set time zone
-		if ($this->config->get('config_timezone')) {
-			date_default_timezone_set($this->config->get('config_timezone'));
-
-			// Sync PHP and DB time zones.
-			$this->db->query("SET time_zone = '" . $this->db->escape(date('P')) . "'");
-		}
-
-		// Theme
-		$this->config->set('template_cache', $this->config->get('developer_theme'));
-		
 		// Url
 		$this->registry->set('url', new Url($this->config->get('config_url'), $this->config->get('config_ssl')));
 		
@@ -121,16 +110,13 @@ class ControllerStartupStartup extends Controller {
 		$this->registry->set('customer', $customer);
 		
 		// Customer Group
-		if (isset($this->session->data['customer']) && isset($this->session->data['customer']['customer_group_id'])) {
+		if ($this->customer->isLogged()) {
+			$this->config->set('config_customer_group_id', $this->customer->getGroupId());
+		} elseif (isset($this->session->data['customer']) && isset($this->session->data['customer']['customer_group_id'])) {
 			// For API calls
 			$this->config->set('config_customer_group_id', $this->session->data['customer']['customer_group_id']);
-		} elseif ($this->customer->isLogged()) {
-			// Logged in customers
-			$this->config->set('config_customer_group_id', $this->customer->getGroupId());
 		} elseif (isset($this->session->data['guest']) && isset($this->session->data['guest']['customer_group_id'])) {
 			$this->config->set('config_customer_group_id', $this->session->data['guest']['customer_group_id']);
-		} else {
-			$this->config->set('config_customer_group_id', $this->config->get('config_customer_group_id'));
 		}
 		
 		// Tracking Code
@@ -139,6 +125,9 @@ class ControllerStartupStartup extends Controller {
 		
 			$this->db->query("UPDATE `" . DB_PREFIX . "marketing` SET clicks = (clicks + 1) WHERE code = '" . $this->db->escape($this->request->get['tracking']) . "'");
 		}		
+		
+		// Affiliate
+		$this->registry->set('affiliate', new Cart\Affiliate($this->registry));
 		
 		// Currency
 		$code = '';
@@ -172,14 +161,13 @@ class ControllerStartupStartup extends Controller {
 		// Tax
 		$this->registry->set('tax', new Cart\Tax($this->registry));
 		
-		// PHP v7.4+ validation compatibility.
-		if (isset($this->session->data['shipping_address']['country_id']) && isset($this->session->data['shipping_address']['zone_id'])) {
+		if (isset($this->session->data['shipping_address'])) {
 			$this->tax->setShippingAddress($this->session->data['shipping_address']['country_id'], $this->session->data['shipping_address']['zone_id']);
 		} elseif ($this->config->get('config_tax_default') == 'shipping') {
 			$this->tax->setShippingAddress($this->config->get('config_country_id'), $this->config->get('config_zone_id'));
 		}
 
-		if (isset($this->session->data['payment_address']['country_id']) && isset($this->session->data['payment_address']['zone_id'])) {
+		if (isset($this->session->data['payment_address'])) {
 			$this->tax->setPaymentAddress($this->session->data['payment_address']['country_id'], $this->session->data['payment_address']['zone_id']);
 		} elseif ($this->config->get('config_tax_default') == 'payment') {
 			$this->tax->setPaymentAddress($this->config->get('config_country_id'), $this->config->get('config_zone_id'));
@@ -198,5 +186,8 @@ class ControllerStartupStartup extends Controller {
 		
 		// Encryption
 		$this->registry->set('encryption', new Encryption($this->config->get('config_encryption')));
+		
+		// OpenBay Pro
+		$this->registry->set('openbay', new Openbay($this->registry));					
 	}
 }

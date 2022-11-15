@@ -1,34 +1,32 @@
 <?php
 class ModelMarketingCoupon extends Model {
+	public function getCustomerAffiliates(){
+		$query = $this->db->query("SELECT * FROM ".DB_PREFIX. "affiliate WHERE status = 1" );
+		return $query->rows;
+	}
 
-				public function getCustomerAffiliates(){
-					$query = $this->db->query("SELECT * FROM ".DB_PREFIX. "customer_affiliate ca JOIN ".DB_PREFIX."customer c ON(ca.customer_id = c.customer_id) WHERE ca.status = 1" );
-					return $query->rows;
-				}
+	public function getLastCoupon()
+	{
+		return $this->db->query("SELECT coupon_id FROM ".DB_PREFIX."coupon ORDER BY coupon_id DESC LIMIT 1")->row['coupon_id'];
+	}
 
-				public function getLastCoupon()
-				{
-					return $this->db->query("SELECT coupon_id FROM ".DB_PREFIX."coupon ORDER BY coupon_id DESC LIMIT 1")->row['coupon_id'];
-				}
+	public function addCouponAffiliate($data, $coupon_id){
+		$this->db->query("INSERT INTO " . DB_PREFIX . "coupon_affiliate SET coupon_id = '".$coupon_id."', affiliate_id = '".$data['affiliate_id']."', affiliate_commission = '".$data['affiliate_commission']."'");
+	}
 
-				public function addCouponAffiliate($data, $coupon_id){
-					$this->db->query("INSERT INTO ".DB_PREFIX."coupon_affiliate SET coupon_id = '".$coupon_id."', affiliate_id = '".$data['affiliate_id']."', affiliate_commission = '".$data['affiliate_commission']."'");
-				}
+	public function editCouponAffiliate($coupon_id, $data){
+		$this->db->query("INSERT INTO ".DB_PREFIX."coupon_affiliate SET coupon_id = '".$coupon_id."', affiliate_id = '".$data['affiliate_id']."', affiliate_commission = '".$data['affiliate_commission']."'");
+	}
 
-				public function editCouponAffiliate($coupon_id, $data){
-					$this->db->query("INSERT INTO ".DB_PREFIX."coupon_affiliate SET coupon_id = '".$coupon_id."', affiliate_id = '".$data['affiliate_id']."', affiliate_commission = '".$data['affiliate_commission']."'");
-				}
+	public function deleteCouponAffiliate($coupon_id){
+		$this->db->query("DELETE FROM ".DB_PREFIX."coupon_affiliate WHERE coupon_id = '".(int)$coupon_id."'");
+	}
 
-				public function deleteCouponAffiliate($coupon_id){
-					$this->db->query("DELETE FROM ".DB_PREFIX."coupon_affiliate WHERE coupon_id = '".(int)$coupon_id."'");
-				}
+	public function getCouponAffiliate($coupon_id){
+		$query  = $this->db->query("SELECT * FROM " .DB_PREFIX. "coupon_affiliate WHERE coupon_id = '".(int)$coupon_id. "'");
 
-				public function getCouponAffiliate($coupon_id){
-					$query  = $this->db->query("SELECT * FROM " .DB_PREFIX. "coupon_affiliate WHERE coupon_id = '".(int)$coupon_id. "'");
-
-					return $query->row;
-				}
-			
+		return $query->row;
+	}
 	public function addCoupon($data) {
 		$this->db->query("INSERT INTO " . DB_PREFIX . "coupon SET name = '" . $this->db->escape($data['name']) . "', code = '" . $this->db->escape($data['code']) . "', discount = '" . (float)$data['discount'] . "', type = '" . $this->db->escape($data['type']) . "', total = '" . (float)$data['total'] . "', logged = '" . (int)$data['logged'] . "', shipping = '" . (int)$data['shipping'] . "', date_start = '" . $this->db->escape($data['date_start']) . "', date_end = '" . $this->db->escape($data['date_end']) . "', uses_total = '" . (int)$data['uses_total'] . "', uses_customer = '" . (int)$data['uses_customer'] . "', status = '" . (int)$data['status'] . "', date_added = NOW()");
 

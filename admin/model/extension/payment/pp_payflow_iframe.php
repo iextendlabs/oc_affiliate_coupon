@@ -3,7 +3,7 @@ class ModelExtensionPaymentPPPayflowIFrame extends Model {
 	public function install() {
 		$this->db->query("
 			CREATE TABLE `" . DB_PREFIX . "paypal_payflow_iframe_order` (
-				`order_id` int(11) NOT NULL,
+				`order_id` int(11) DEFAULT NULL,
 				`secure_token_id` varchar(255) NOT NULL,
 				`transaction_reference` varchar(255) DEFAULT NULL,
 				`transaction_type` varchar(1) DEFAULT NULL,
@@ -30,7 +30,7 @@ class ModelExtensionPaymentPPPayflowIFrame extends Model {
 	}
 
 	public function log($message) {
-		if ($this->config->get('payment_pp_payflow_iframe_debug')) {
+		if ($this->config->get('pp_payflow_iframe_debug')) {
 			$log = new Log('payflow-iframe.log');
 			$log->write($message);
 		}
@@ -92,16 +92,16 @@ class ModelExtensionPaymentPPPayflowIFrame extends Model {
 
 	public function call($data) {
 		$default_parameters = array(
-			'USER' => $this->config->get('payment_pp_payflow_iframe_user'),
-			'VENDOR' => $this->config->get('payment_pp_payflow_iframe_vendor'),
-			'PWD' => $this->config->get('payment_pp_payflow_iframe_password'),
-			'PARTNER' => $this->config->get('payment_pp_payflow_iframe_partner'),
+			'USER' => $this->config->get('pp_payflow_iframe_user'),
+			'VENDOR' => $this->config->get('pp_payflow_iframe_vendor'),
+			'PWD' => $this->config->get('pp_payflow_iframe_password'),
+			'PARTNER' => $this->config->get('pp_payflow_iframe_partner'),
 			'BUTTONSOURCE' => 'OpenCart_Cart_PFP',
 		);
 
 		$call_parameters = array_merge($data, $default_parameters);
 
-		if ($this->config->get('payment_pp_payflow_iframe_test')) {
+		if ($this->config->get('pp_payflow_iframe_test')) {
 			$url = 'https://pilot-payflowpro.paypal.com';
 		} else {
 			$url = 'https://payflowpro.paypal.com';

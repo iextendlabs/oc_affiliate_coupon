@@ -11,12 +11,16 @@ class ControllerExtensionTotalReward extends Controller {
 			}
 		}
 
-		if ($points && $points_total && $this->config->get('total_reward_status')) {
+		if ($points && $points_total && $this->config->get('reward_status')) {
 			$this->load->language('extension/total/reward');
 
 			$data['heading_title'] = sprintf($this->language->get('heading_title'), $points);
 
+			$data['text_loading'] = $this->language->get('text_loading');
+
 			$data['entry_reward'] = sprintf($this->language->get('entry_reward'), $points_total);
+
+			$data['button_reward'] = $this->language->get('button_reward');
 
 			if (isset($this->session->data['reward'])) {
 				$data['reward'] = $this->session->data['reward'];
@@ -43,7 +47,7 @@ class ControllerExtensionTotalReward extends Controller {
 			}
 		}
 
-		if (!isset($this->request->post['reward']) || !is_numeric($this->request->post['reward']) || ($this->request->post['reward'] <= 0)) {
+		if (empty($this->request->post['reward'])) {
 			$json['error'] = $this->language->get('error_reward');
 		}
 
@@ -63,7 +67,7 @@ class ControllerExtensionTotalReward extends Controller {
 			if (isset($this->request->post['redirect'])) {
 				$json['redirect'] = $this->url->link($this->request->post['redirect']);
 			} else {
-				$json['redirect'] = $this->url->link('checkout/cart');
+				$json['redirect'] = $this->url->link('checkout/cart');	
 			}
 		}
 

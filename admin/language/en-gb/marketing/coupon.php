@@ -9,14 +9,11 @@ $_['text_add']            = 'Add Coupon';
 $_['text_edit']           = 'Edit Coupon';
 $_['text_percent']        = 'Percentage';
 $_['text_amount']         = 'Fixed Amount';
-$_['text_coupon']         = 'Coupon History';
 
 // Column
-
-					$_['column_affliate']     = 'Affiliate';
-					$_['column_commission']   = 'Commission (%)';
-					$_['text_no_affiliate']   = 'No Affiliate';
-			
+$_['column_affliate']     = 'Affiliate';
+$_['column_commission']   = 'Commission (%)';
+$_['text_no_affiliate']   = 'No Affiliate';
 $_['column_name']         = 'Coupon Name';
 $_['column_code']         = 'Code';
 $_['column_discount']     = 'Discount';

@@ -3,7 +3,7 @@ class ControllerCommonReset extends Controller {
 	private $error = array();
 
 	public function index() {
-		if ($this->user->isLogged() && isset($this->request->get['user_token']) && ($this->request->get['user_token'] == $this->session->data['user_token'])) {
+		if ($this->user->isLogged() && isset($this->request->get['token']) && ($this->request->get['token'] == $this->session->data['token'])) {
 			$this->response->redirect($this->url->link('common/dashboard', '', true));
 		}
 
@@ -29,12 +29,20 @@ class ControllerCommonReset extends Controller {
 			if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 				$this->model_user_user->editPassword($user_info['user_id'], $this->request->post['password']);
 
-				$this->model_user_user->deleteLoginAttempts($user_info['username']);
-
 				$this->session->data['success'] = $this->language->get('text_success');
 
 				$this->response->redirect($this->url->link('common/login', '', true));
 			}
+
+			$data['heading_title'] = $this->language->get('heading_title');
+
+			$data['text_password'] = $this->language->get('text_password');
+
+			$data['entry_password'] = $this->language->get('entry_password');
+			$data['entry_confirm'] = $this->language->get('entry_confirm');
+
+			$data['button_save'] = $this->language->get('button_save');
+			$data['button_cancel'] = $this->language->get('button_cancel');
 
 			$data['breadcrumbs'] = array();
 
@@ -90,7 +98,7 @@ class ControllerCommonReset extends Controller {
 	}
 
 	protected function validate() {
-		if ((utf8_strlen(html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')) < 4) || (utf8_strlen(html_entity_decode($this->request->post['password'], ENT_QUOTES, 'UTF-8')) > 40)) {
+		if ((utf8_strlen($this->request->post['password']) < 4) || (utf8_strlen($this->request->post['password']) > 20)) {
 			$this->error['password'] = $this->language->get('error_password');
 		}
 

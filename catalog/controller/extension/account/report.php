@@ -2,13 +2,33 @@
 class ControllerExtensionAccountReport extends Controller{
 	public function index(){
 
-		if (!$this->customer->isLogged()) {
-			$this->session->data['redirect'] = $this->url->link('account/account', '', true);
+		if (!$this->affiliate->isLogged()) {
+			$this->session->data['redirect'] = $this->url->link('affiliate/account', '', true);
 
-			$this->response->redirect($this->url->link('account/login', '', true));
+			$this->response->redirect($this->url->link('affiliate/login', '', true));
 		}
 
 		$this->load->language('extension/account/report');
+
+		$data['heading_title'] = $this->language->get('heading_title');
+		
+		$data['text_list'] = $this->language->get('text_list');
+		$data['text_account'] = $this->language->get('text_account');
+		$data['text_report'] = $this->language->get('text_report');
+		$data['text_completed_orders'] = $this->language->get('text_completed_orders');
+		$data['text_shipped_orders'] = $this->language->get('text_shipped_orders');
+		$data['text_cancelled_orders'] = $this->language->get('text_cancelled_orders');
+		$data['text_pending_orders'] = $this->language->get('text_pending_orders');
+		$data['text_processing_orders'] = $this->language->get('text_processing_orders');
+		$data['text_filter'] = $this->language->get('text_filter');
+		$data['text_no_results'] = $this->language->get('text_no_results');
+		$data['column_order_id'] = $this->language->get('column_order_id');
+		$data['column_date_added'] = $this->language->get('column_date_added');
+		$data['column_date_modified'] = $this->language->get('column_date_modified');
+		$data['column_description'] = $this->language->get('column_description');
+		$data['column_order_subtotal'] = $this->language->get('column_order_subtotal');
+		$data['column_commission'] = $this->language->get('column_commission');
+		$data['column_balance'] = $this->language->get('column_balance');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -32,7 +52,6 @@ class ControllerExtensionAccountReport extends Controller{
 
 		$this->load->model('extension/account/report');
 
-
 		// get last 30 months
 		$months=array();
 
@@ -54,7 +73,7 @@ class ControllerExtensionAccountReport extends Controller{
 			$filter_year = $this->request->get['year'];
 		}
 
-		$customer_id  = $this->customer->getId();
+		$customer_id  = $this->affiliate->getId();
 		$data['transactions'] = array();
 
 		// order status ids for report
